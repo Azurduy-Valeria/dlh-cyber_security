@@ -1,3 +1,2 @@
 #!/bin/bash
-sha256sum "$1"
-echo
+sha256sum "$1" | xargs echo
