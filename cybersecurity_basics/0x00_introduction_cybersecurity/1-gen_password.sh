@@ -1,3 +1,3 @@
 #!/bin/bash
-length="$1"
-tr -dc '[:alnum:]' < /dev/urandom | head -c "$length"; echo
+tr -dc '[:alnum:]' < /dev/urandom | head -c "$1"
+echo
