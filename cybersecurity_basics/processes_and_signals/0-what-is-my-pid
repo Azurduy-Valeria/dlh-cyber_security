@@ -1,2 +1,3 @@
-#!/bin/bash
-ps -o pid= -p $$
+#!/usr/bin/env bash
+# Displays current's bash PID
+echo $$
