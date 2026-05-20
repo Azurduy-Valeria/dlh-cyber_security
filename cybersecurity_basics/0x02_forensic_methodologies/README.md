@@ -17,3 +17,8 @@ Read the incident scenario and identify the primary activity in the command hist
 
 Read the scenario and identify the attack vector: malicious queries injected through a login form points to SQL Injection.
 
+## Task 4 - Pinpointing the Attack Method
+
+Read the scenario and identify the method: an unpatched remote management service on an open port points to exploiting a known vulnerability.
+
+**Finding:** `C`
