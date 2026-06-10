@@ -3,3 +3,5 @@ Set up burp, added DNS configuration to be able to access the  follwoing domain 
 
 for task1:
 Downloaded the certificate found on chromium in the landing page, uploaded using the overriding option, input the password and loaded again the page, then found the flag
+
+{"username":"admin","password":"Michelangelo","role":"admin","remember_me":1}
