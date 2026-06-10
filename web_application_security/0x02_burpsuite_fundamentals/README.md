@@ -9,3 +9,5 @@ Downloaded the certificate found on chromium in the landing page, uploaded using
 58264005
 
 d1389820-74e8-4e88-bead-215daf94b354-178112747247
+
+H4sIAAAAAAAA/6tWKi1OLcpLzE1VslJQcqwqLUoprdQNS8xJLcpMVNJRUEpMyc3MA8qVFJWm1gIA3xCRSy4AAAA=
