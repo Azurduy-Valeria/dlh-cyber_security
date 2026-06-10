@@ -5,3 +5,7 @@ for task1:
 Downloaded the certificate found on chromium in the landing page, uploaded using the overriding option, input the password and loaded again the page, then found the flag
 
 {"username":"admin","password":"Michelangelo","role":"admin","remember_me":1}
+
+58264005
+
+d1389820-74e8-4e88-bead-215daf94b354-178112747247
