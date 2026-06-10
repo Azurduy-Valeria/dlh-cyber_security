@@ -5,3 +5,5 @@ Username: yosri
 Password: Pa#T_18fCn_6aVIcnrHIxvTag
 
 followed three users and found the flag for task3
+
+in tas4, found 'bio' as vulnerable field because it does not encode special characters
