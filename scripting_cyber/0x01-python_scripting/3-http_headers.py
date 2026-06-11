@@ -2,6 +2,7 @@
 import requests
 
 def get_http_headers(url):
+    try:
         response = requests.get(url)
         return {
             'status_code': response.status_code,
