@@ -56,3 +56,9 @@
 - **Effective Risk**: A contained, serious incident within radiology — not a hospital-wide outage event.
 
 **Risk Amplification Factor**: The starkest of the three. Because this vulnerability class is wormable, the flat network doesn't just widen the blast radius — it changes the *kind* of event entirely, from "one imaging device compromised" to "a WannaCry-style cascading outage across the organization's Windows fleet during active patient care."
+
+---
+
+## Network Posture Summary
+
+Across all 31 findings, the flat network doesn't make each vulnerability "somewhat worse" — it deletes the concept of a contained blast radius entirely. The effective organizational risk of this scan report isn't 31 separate, independently-scoped risks; it's one shared risk surface with 31 possible entry points, because compromising *any single one* of them — a financial app, a web server, a workstation, a medical device — grants a foothold from which every other host, dataset, and device class in the environment becomes reachable. This is exactly why network segmentation is arguably more impactful than patching any single CVE in this report: patching a vulnerability closes exactly one entry point while leaving the other 30 findings — and every CVE not yet disclosed — with the identical unlimited blast radius they have today. Segmentation, by contrast, permanently caps the blast radius of *every* vulnerability at once: current findings, future patches that don't get applied on schedule, and zero-days that haven't been written yet. That's precisely why the 1x00 control gap analysis (G-006) already flagged the total absence of any compensating/segmentation control as the single most consequential gap in the entire environment — more consequential, on its own, than any individual missing patch, because it's the one gap that determines how far *every other* gap is allowed to reach.
