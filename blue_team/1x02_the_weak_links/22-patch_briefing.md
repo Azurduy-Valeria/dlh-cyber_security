@@ -10,3 +10,7 @@ Any device on our network can connect directly to the database holding every pat
 An attacker on any one computer can use a common technique to take over the system that manages every employee login. If exploited: every server we have could be locked down or ransomed at once, not just one. **Fix: turn on a setting already built into the software. Under $1,000, one week.**
 
 **Total: ~$7,000 and a few IT hours** — not a budget problem, a scheduling one.
+
+---
+
+In three weeks, we've gone from mapping what we have, to understanding who'd attack it, to knowing exactly where the cracks are and what to fix first.
