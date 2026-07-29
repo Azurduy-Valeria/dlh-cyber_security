@@ -30,7 +30,7 @@ CN = portal.meddefense.local
 O  = MedDefense Health Systems
 OU = Information Technology
 L  = Central City
-ST = State
+ST = California
 C  = US
 
 [ req_ext ]
@@ -57,7 +57,7 @@ $ openssl req -text -noout -in portal.csr
 Certificate Request:
     Data:
         Version: 1 (0x0)
-        Subject: CN = portal.meddefense.local, O = MedDefense Health Systems, OU = Information Technology, L = Central City, ST = State, C = US
+        Subject: CN = portal.meddefense.local, O = MedDefense Health Systems, OU = Information Technology, L = Central City, ST = California, C = US
         Subject Public Key Info:
             Public Key Algorithm: id-ecPublicKey
                 Public-Key: (256 bit)

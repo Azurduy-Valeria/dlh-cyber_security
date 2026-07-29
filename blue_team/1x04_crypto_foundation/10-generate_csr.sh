@@ -28,7 +28,7 @@ CN = portal.meddefense.local
 O  = MedDefense Health Systems
 OU = Information Technology
 L  = Central City
-ST = State
+ST = California
 C  = US
 
 [ req_ext ]
