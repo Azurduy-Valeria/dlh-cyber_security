@@ -1,13 +1,20 @@
 #!/bin/bash
+#
+# 10-generate_csr.sh
+# Automates key generation and CSR creation for the MedDefense patient portal.
+# Uses OpenSSL for both the private key (ECC P-256) and the CSR itself.
+#
+# Usage: ./10-generate_csr.sh
+#   Produces: portalkey.pem (private key) and portal.csr (certificate request)
 
 set -euo pipefail
 
-PREFIX="${1:-portal}"
-KEY_FILE="${PREFIX}key.pem"
-CSR_FILE="${PREFIX}.csr"
+KEY_FILE="portalkey.pem"
+CSR_FILE="portal.csr"
 CONFIG_FILE="$(mktemp)"
 
-# Generate the OpenSSL config inline so the script is self-contained.
+# OpenSSL config for the CSR: MedDefense identity fields + SAN entries,
+# generated inline so the script is self-contained.
 cat > "$CONFIG_FILE" <<'EOF'
 [ req ]
 default_bits       = 256
@@ -33,15 +40,15 @@ DNS.2 = portal.meddefense.com
 DNS.3 = www.portal.meddefense.com
 EOF
 
-echo "[1/3] Generating ECC P-256 private key -> $KEY_FILE"
-openssl ecparam -genkey -name prime256v1 -out "$KEY_FILE"
-chmod 600 "$KEY_FILE"
+echo "[1/3] Generating ECC P-256 private key with OpenSSL -> portalkey.pem"
+openssl ecparam -genkey -name prime256v1 -out portalkey.pem
+chmod 600 portalkey.pem
 
-echo "[2/3] Generating CSR -> $CSR_FILE"
-openssl req -new -key "$KEY_FILE" -out "$CSR_FILE" -config "$CONFIG_FILE"
+echo "[2/3] Generating CSR with OpenSSL -> portal.csr"
+openssl req -new -key portalkey.pem -out portal.csr -config "$CONFIG_FILE"
 
 echo "[3/3] Inspecting CSR:"
-openssl req -text -noout -in "$CSR_FILE"
+openssl req -text -noout -in portal.csr
 
 rm -f "$CONFIG_FILE"
 echo ""
