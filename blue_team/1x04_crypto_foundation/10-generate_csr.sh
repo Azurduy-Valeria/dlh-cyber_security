@@ -1,11 +1,7 @@
 #!/bin/bash
-#
-# 10-generate_csr.sh
+
 # Automates key generation and CSR creation for the MedDefense patient portal.
 # Uses OpenSSL for both the private key (ECC P-256) and the CSR itself.
-#
-# Usage: ./10-generate_csr.sh
-#   Produces: portalkey.pem (private key) and portal.csr (certificate request)
 
 set -euo pipefail
 
@@ -17,7 +13,8 @@ CONFIG_FILE="$(mktemp)"
 # generated inline so the script is self-contained.
 cat > "$CONFIG_FILE" <<'EOF'
 [ req ]
-default_bits       = 256
+# default_bits is intentionally omitted: the EC key is pre-generated via
+# `openssl ecparam -genkey` (P-256), so req never derives a key size itself.
 prompt             = no
 default_md         = sha256
 distinguished_name = dn

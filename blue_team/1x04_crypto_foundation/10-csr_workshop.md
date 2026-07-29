@@ -4,7 +4,7 @@
 
 **Choice: ECC P-256.**
 
-Justification: at the security level MedDefense actually needs (roughly equivalent to RSA-3072, per Task 6's table), P-256 is dramatically cheaper to compute than RSA-2048 or RSA-4096 — real numbers from Task 1/2's own benchmarking showed the size and computational gap directly. For a web server handling ~800 patient connections per day, that's not a huge load in absolute terms, but every TLS handshake still pays the asymmetric-crypto cost once, and ECC's smaller keys mean less data exchanged and faster handshake math on every single one of those 800 daily connections, with zero compromise on security level. Compatibility is a non-issue today — P-256 has been universally supported in browsers and mobile OSes for close to a decade, and both real-world certificates inspected in Task 8 (letsencrypt.org, github.com) already use P-256 in production. This also directly matches the Algorithm Reference Table's own recommendation (Task 6) to standardize on ECC P-256 for new certificate deployments.
+Justification: at the security level MedDefense actually needs (roughly equivalent to RSA-3072, per Task 6's table), P-256 is dramatically cheaper to compute than RSA-2048 or RSA-4096 — real numbers from Task 1/2's own benchmarking showed the size and computational gap directly. For a web server handling ~800 patient connections per day, that's not a huge load in absolute terms, but every TLS handshake still pays the asymmetric-crypto cost once, and ECC's smaller keys mean less data exchanged and faster handshake math on every single one of those 800 daily connections, with zero compromise on security level. Compatibility was weighed, not assumed away: P-256 has been universally supported in browsers and mobile OSes for close to a decade (and both real-world certificates inspected in Task 8 — letsencrypt.org, github.com — already use P-256 in production), and the only devices that would actually fail to negotiate it are pre-2013 browsers and long-EOL mobile OS versions that are already unable to complete a modern TLS 1.2+ handshake at all, so an ECC-only certificate excludes nobody beyond what an already-hardened server config excludes. This also directly matches the Algorithm Reference Table's own recommendation (Task 6) to standardize on ECC P-256 for new certificate deployments.
 
 ```
 $ openssl ecparam -genkey -name prime256v1 -out portalkey.pem
@@ -19,7 +19,8 @@ Config file (`openssl.cnf`) used to supply every required field non-interactivel
 
 ```ini
 [ req ]
-default_bits       = 256
+# default_bits is intentionally omitted: the EC key is pre-generated via
+# `openssl ecparam -genkey` (P-256), so req never derives a key size itself.
 prompt             = no
 default_md         = sha256
 distinguished_name = dn
@@ -42,9 +43,13 @@ DNS.2 = portal.meddefense.com
 DNS.3 = www.portal.meddefense.com
 ```
 
+Save the block above as `openssl.cnf` in the working directory, then generate the CSR non-interactively against it:
+
 ```
 $ openssl req -new -key portalkey.pem -out portal.csr -config openssl.cnf
 ```
+
+(`10-generate_csr.sh` automates this same process end-to-end: it writes this exact config to a temp file at runtime instead of a committed `openssl.cnf`, so the script has no leftover config file to clean up, but the fields and the resulting CSR are identical either way.)
 
 `portal.meddefense.com` and `www.portal.meddefense.com` are included alongside the internal `portal.meddefense.local` name specifically because patients accessing the portal from outside the internal network (mobile devices, home computers) would resolve a public-facing hostname, not the internal `.local` name — missing that SAN entry would break access for exactly the population (patients, not staff) this certificate exists to serve.
 
