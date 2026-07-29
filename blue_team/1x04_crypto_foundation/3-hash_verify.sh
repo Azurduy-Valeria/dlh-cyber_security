@@ -1,9 +1,4 @@
 #!/bin/bash
-#
-# 3-hash_verify.sh
-# Verifies a file's integrity against an expected SHA-256 hash.
-#
-# Usage: ./3-hash_verify.sh <file_path> <expected_sha256_hash>
 
 set -euo pipefail
 

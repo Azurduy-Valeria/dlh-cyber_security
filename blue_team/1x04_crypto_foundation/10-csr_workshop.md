@@ -7,8 +7,8 @@
 Justification: at the security level MedDefense actually needs (roughly equivalent to RSA-3072, per Task 6's table), P-256 is dramatically cheaper to compute than RSA-2048 or RSA-4096 — real numbers from Task 1/2's own benchmarking showed the size and computational gap directly. For a web server handling ~800 patient connections per day, that's not a huge load in absolute terms, but every TLS handshake still pays the asymmetric-crypto cost once, and ECC's smaller keys mean less data exchanged and faster handshake math on every single one of those 800 daily connections, with zero compromise on security level. Compatibility is a non-issue today — P-256 has been universally supported in browsers and mobile OSes for close to a decade, and both real-world certificates inspected in Task 8 (letsencrypt.org, github.com) already use P-256 in production. This also directly matches the Algorithm Reference Table's own recommendation (Task 6) to standardize on ECC P-256 for new certificate deployments.
 
 ```
-$ openssl ecparam -genkey -name prime256v1 -out portal_key.pem
-$ chmod 600 portal_key.pem
+$ openssl ecparam -genkey -name prime256v1 -out portalkey.pem
+$ chmod 600 portalkey.pem
 ```
 
 ---
@@ -43,7 +43,7 @@ DNS.3 = www.portal.meddefense.com
 ```
 
 ```
-$ openssl req -new -key portal_key.pem -out portal.csr -config openssl.cnf
+$ openssl req -new -key portalkey.pem -out portal.csr -config openssl.cnf
 ```
 
 `portal.meddefense.com` and `www.portal.meddefense.com` are included alongside the internal `portal.meddefense.local` name specifically because patients accessing the portal from outside the internal network (mobile devices, home computers) would resolve a public-facing hostname, not the internal `.local` name — missing that SAN entry would break access for exactly the population (patients, not staff) this certificate exists to serve.

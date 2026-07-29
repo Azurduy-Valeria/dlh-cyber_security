@@ -1,14 +1,4 @@
 #!/bin/bash
-#
-# 12-luks_manager.sh
-# Creates, opens, or closes a LUKS-encrypted volume.
-#
-# Usage:
-#   Create: sudo ./12-luks_manager.sh create <volume_file> <size_in_MB>
-#   Open:   sudo ./12-luks_manager.sh open <volume_file> <mapper_name> <mount_point>
-#   Close:  sudo ./12-luks_manager.sh close <mapper_name> <mount_point>
-#
-# Requires root (cryptsetup, mount, mkfs.ext4 all need it).
 
 set -euo pipefail
 

@@ -1,11 +1,4 @@
 #!/bin/bash
-#
-# 5-sign_verify.sh
-# Signs or verifies a file using RSA + SHA-256.
-#
-# Usage:
-#   Sign:   ./5-sign_verify.sh sign <file_path> <private_key_path>
-#   Verify: ./5-sign_verify.sh verify <file_path> <signature_path> <public_key_path>
 
 set -euo pipefail
 

@@ -1,15 +1,9 @@
 #!/bin/bash
-#
-# 10-generate_csr.sh
-# Automates key generation and CSR creation for the MedDefense patient portal.
-#
-# Usage: ./10-generate_csr.sh [output_prefix]
-#   Produces: <prefix>_key.pem, <prefix>.csr, and prints the CSR inspection.
 
 set -euo pipefail
 
 PREFIX="${1:-portal}"
-KEY_FILE="${PREFIX}_key.pem"
+KEY_FILE="${PREFIX}key.pem"
 CSR_FILE="${PREFIX}.csr"
 CONFIG_FILE="$(mktemp)"
 

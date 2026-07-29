@@ -1,16 +1,4 @@
 #!/bin/bash
-#
-# 1-symmetric_encrypt.sh
-# Encrypts a file with AES-256, in either CBC or GCM mode.
-#
-# Usage: ./1-symmetric_encrypt.sh <input_file> <output_file> <cbc|gcm>
-#
-# Note on GCM: the `openssl enc` command does not support AEAD ciphers
-# (AES-GCM, AES-CCM) — this is a deliberate upstream OpenSSL decision,
-# not a bug (the `enc` tool has no defined way to store/verify the
-# authentication tag). CBC mode below uses `openssl enc` directly;
-# GCM mode uses Python's `cryptography` library instead, since that's
-# the standard real-world workaround when the OpenSSL CLI can't do it.
 
 set -euo pipefail
 
