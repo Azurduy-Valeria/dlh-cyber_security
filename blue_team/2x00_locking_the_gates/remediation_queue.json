@@ -1,0 +1,462 @@
+[
+  {
+    "control_id": "MD-CIS-03",
+    "title": "Enforce account lockout and password history via PAM (pam_faillock)",
+    "severity": "critical",
+    "asset_scope": [
+      "billing-srv-01",
+      "web-srv-01",
+      "log-srv-01"
+    ],
+    "implementation_task": "8-pam_hardening.sh",
+    "verification_method": "grep -E 'deny|unlock_time|fail_interval' pam_faillock config and 'remember' in /etc/pam.d/common-password",
+    "status": "partially_compliant",
+    "matched_findings": [
+      {
+        "severity": "suggestion",
+        "test_id": "AUTH-9230",
+        "message": "Configure password hashing rounds in /etc/login.defs"
+      },
+      {
+        "severity": "suggestion",
+        "test_id": "AUTH-9262",
+        "message": "Install a PAM module for password strength testing like pam_cracklib or pam_passwdqc"
+      },
+      {
+        "severity": "suggestion",
+        "test_id": "AUTH-9286",
+        "message": "Configure minimum password age in /etc/login.defs"
+      },
+      {
+        "severity": "suggestion",
+        "test_id": "AUTH-9286",
+        "message": "Configure maximum password age in /etc/login.defs"
+      },
+      {
+        "severity": "suggestion",
+        "test_id": "AUTH-9328",
+        "message": "Default umask in /etc/login.defs could not be found and defaults usually to 022, which could be more strict like 027"
+      }
+    ],
+    "priority_score": 80,
+    "affected_asset": [
+      "billing-srv-01",
+      "web-srv-01",
+      "log-srv-01"
+    ],
+    "remediation_script": "8-pam_hardening.sh",
+    "operational_risk": "Partially addressed: Lynis flags related weaknesses for \"Enforce account lockout and password history via PAM (pam_faillock)\" that have not been fully remediated on billing-srv-01, web-srv-01, log-srv-01",
+    "expected_validation_check": "grep -E 'deny|unlock_time|fail_interval' pam_faillock config and 'remember' in /etc/pam.d/common-password"
+  },
+  {
+    "control_id": "MD-CIS-13",
+    "title": "Deploy auditd rules for identity, privilege escalation and suspicious tool execution",
+    "severity": "critical",
+    "asset_scope": [
+      "billing-srv-01",
+      "web-srv-01",
+      "log-srv-01"
+    ],
+    "implementation_task": "10-auditd_config.sh",
+    "verification_method": "auditctl -l lists the identity/priv_esc/suspicious_download rules; ausearch -k identity returns events on a test access",
+    "status": "partially_compliant",
+    "matched_findings": [
+      {
+        "severity": "suggestion",
+        "test_id": "ACCT-9622",
+        "message": "Enable process accounting"
+      },
+      {
+        "severity": "suggestion",
+        "test_id": "ACCT-9626",
+        "message": "Enable sysstat to collect accounting (disabled)"
+      },
+      {
+        "severity": "suggestion",
+        "test_id": "ACCT-9628",
+        "message": "Enable auditd to collect audit information"
+      }
+    ],
+    "priority_score": 75,
+    "affected_asset": [
+      "billing-srv-01",
+      "web-srv-01",
+      "log-srv-01"
+    ],
+    "remediation_script": "10-auditd_config.sh",
+    "operational_risk": "Partially addressed: Lynis flags related weaknesses for \"Deploy auditd rules for identity, privilege escalation and suspicious tool execution\" that have not been fully remediated on billing-srv-01, web-srv-01, log-srv-01",
+    "expected_validation_check": "auditctl -l lists the identity/priv_esc/suspicious_download rules; ausearch -k identity returns events on a test access"
+  },
+  {
+    "control_id": "MD-CIS-05",
+    "title": "Disable IP forwarding and enable anti-spoofing kernel parameters",
+    "severity": "critical",
+    "asset_scope": [
+      "billing-srv-01",
+      "web-srv-01",
+      "log-srv-01"
+    ],
+    "implementation_task": "5-sysctl_hardening.sh",
+    "verification_method": "sysctl net.ipv4.ip_forward net.ipv4.conf.all.accept_redirects net.ipv4.conf.all.rp_filter",
+    "status": "partially_compliant",
+    "matched_findings": [
+      {
+        "severity": "suggestion",
+        "test_id": "KRNL-5820",
+        "message": "If not required, consider explicit disabling of core dump in /etc/security/limits.conf file"
+      },
+      {
+        "severity": "suggestion",
+        "test_id": "KRNL-6000",
+        "message": "One or more sysctl values differ from the scan profile and could be tweaked"
+      }
+    ],
+    "priority_score": 70,
+    "affected_asset": [
+      "billing-srv-01",
+      "web-srv-01",
+      "log-srv-01"
+    ],
+    "remediation_script": "5-sysctl_hardening.sh",
+    "operational_risk": "Partially addressed: Lynis flags related weaknesses for \"Disable IP forwarding and enable anti-spoofing kernel parameters\" that have not been fully remediated on billing-srv-01, web-srv-01, log-srv-01",
+    "expected_validation_check": "sysctl net.ipv4.ip_forward net.ipv4.conf.all.accept_redirects net.ipv4.conf.all.rp_filter"
+  },
+  {
+    "control_id": "MD-CIS-04",
+    "title": "Enforce password quality requirements (pwquality)",
+    "severity": "high",
+    "asset_scope": [
+      "billing-srv-01",
+      "web-srv-01",
+      "log-srv-01"
+    ],
+    "implementation_task": "8-pam_hardening.sh",
+    "verification_method": "grep -E 'minlen|dcredit|ucredit|lcredit|ocredit|reject_username' /etc/security/pwquality.conf",
+    "status": "partially_compliant",
+    "matched_findings": [
+      {
+        "severity": "suggestion",
+        "test_id": "AUTH-9230",
+        "message": "Configure password hashing rounds in /etc/login.defs"
+      },
+      {
+        "severity": "suggestion",
+        "test_id": "AUTH-9262",
+        "message": "Install a PAM module for password strength testing like pam_cracklib or pam_passwdqc"
+      },
+      {
+        "severity": "suggestion",
+        "test_id": "AUTH-9286",
+        "message": "Configure minimum password age in /etc/login.defs"
+      },
+      {
+        "severity": "suggestion",
+        "test_id": "AUTH-9286",
+        "message": "Configure maximum password age in /etc/login.defs"
+      },
+      {
+        "severity": "suggestion",
+        "test_id": "AUTH-9328",
+        "message": "Default umask in /etc/login.defs could not be found and defaults usually to 022, which could be more strict like 027"
+      }
+    ],
+    "priority_score": 65,
+    "affected_asset": [
+      "billing-srv-01",
+      "web-srv-01",
+      "log-srv-01"
+    ],
+    "remediation_script": "8-pam_hardening.sh",
+    "operational_risk": "Partially addressed: Lynis flags related weaknesses for \"Enforce password quality requirements (pwquality)\" that have not been fully remediated on billing-srv-01, web-srv-01, log-srv-01",
+    "expected_validation_check": "grep -E 'minlen|dcredit|ucredit|lcredit|ocredit|reject_username' /etc/security/pwquality.conf"
+  },
+  {
+    "control_id": "MD-CIS-08",
+    "title": "Disable and remove unnecessary network-facing services",
+    "severity": "high",
+    "asset_scope": [
+      "billing-srv-01",
+      "web-srv-01",
+      "log-srv-01"
+    ],
+    "implementation_task": "7-service_minimization.sh",
+    "verification_method": "systemctl list-units --type=service --state=running compared against the MedDefense whitelist",
+    "status": "partially_compliant",
+    "matched_findings": [
+      {
+        "severity": "suggestion",
+        "test_id": "DEB-0831",
+        "message": "Install needrestart, alternatively to debian-goodies, so that you can run needrestart after upgrades to determine which daemons are using old versions of libraries and need restarting."
+      },
+      {
+        "severity": "suggestion",
+        "test_id": "BOOT-5264",
+        "message": "Consider hardening system services"
+      },
+      {
+        "severity": "suggestion",
+        "test_id": "PRNT-2307",
+        "message": "Access to CUPS configuration could be more strict."
+      },
+      {
+        "severity": "suggestion",
+        "test_id": "CONT-8104",
+        "message": "Run 'docker info' to see warnings applicable to Docker daemon"
+      }
+    ],
+    "priority_score": 65,
+    "affected_asset": [
+      "billing-srv-01",
+      "web-srv-01",
+      "log-srv-01"
+    ],
+    "remediation_script": "7-service_minimization.sh",
+    "operational_risk": "Partially addressed: Lynis flags related weaknesses for \"Disable and remove unnecessary network-facing services\" that have not been fully remediated on billing-srv-01, web-srv-01, log-srv-01",
+    "expected_validation_check": "systemctl list-units --type=service --state=running compared against the MedDefense whitelist"
+  },
+  {
+    "control_id": "MD-CIS-09",
+    "title": "Restrict the database service to localhost/authorized subnet only",
+    "severity": "critical",
+    "asset_scope": [
+      "billing-srv-01"
+    ],
+    "implementation_task": "7-service_minimization.sh",
+    "verification_method": "ss -tulpen | grep 3306 shows a bind address of 127.0.0.1 or the internal management subnet only",
+    "status": "partially_compliant",
+    "matched_findings": [
+      {
+        "severity": "suggestion",
+        "test_id": "PKGS-7370",
+        "message": "Install debsums utility for the verification of packages with known good database."
+      }
+    ],
+    "priority_score": 65,
+    "affected_asset": [
+      "billing-srv-01"
+    ],
+    "remediation_script": "7-service_minimization.sh",
+    "operational_risk": "Partially addressed: Lynis flags related weaknesses for \"Restrict the database service to localhost/authorized subnet only\" that have not been fully remediated on billing-srv-01",
+    "expected_validation_check": "ss -tulpen | grep 3306 shows a bind address of 127.0.0.1 or the internal management subnet only"
+  },
+  {
+    "control_id": "MD-CIS-10",
+    "title": "Remove SUID/SGID bits from non-whitelisted binaries",
+    "severity": "high",
+    "asset_scope": [
+      "billing-srv-01",
+      "web-srv-01",
+      "log-srv-01"
+    ],
+    "implementation_task": "6-filesystem_hardening.sh",
+    "verification_method": "find / -perm -4000 -o -perm -2000, diffed against the Ubuntu 22.04 whitelist, shows zero unexpected entries",
+    "status": "partially_compliant",
+    "matched_findings": [
+      {
+        "severity": "suggestion",
+        "test_id": "FILE-6310",
+        "message": "To decrease the impact of a full /home file system, place /home on a separate partition"
+      },
+      {
+        "severity": "suggestion",
+        "test_id": "FILE-6310",
+        "message": "To decrease the impact of a full /tmp file system, place /tmp on a separate partition"
+      },
+      {
+        "severity": "suggestion",
+        "test_id": "FILE-6310",
+        "message": "To decrease the impact of a full /var file system, place /var on a separate partition"
+      },
+      {
+        "severity": "suggestion",
+        "test_id": "FILE-7524",
+        "message": "Consider restricting file permissions"
+      }
+    ],
+    "priority_score": 65,
+    "affected_asset": [
+      "billing-srv-01",
+      "web-srv-01",
+      "log-srv-01"
+    ],
+    "remediation_script": "6-filesystem_hardening.sh",
+    "operational_risk": "Partially addressed: Lynis flags related weaknesses for \"Remove SUID/SGID bits from non-whitelisted binaries\" that have not been fully remediated on billing-srv-01, web-srv-01, log-srv-01",
+    "expected_validation_check": "find / -perm -4000 -o -perm -2000, diffed against the Ubuntu 22.04 whitelist, shows zero unexpected entries"
+  },
+  {
+    "control_id": "MD-CIS-02",
+    "title": "Harden SSH session controls: auth attempts, idle timeout, grace time, banner, user allow-list",
+    "severity": "high",
+    "asset_scope": [
+      "billing-srv-01",
+      "web-srv-01",
+      "log-srv-01"
+    ],
+    "implementation_task": "4-ssh_hardening.sh",
+    "verification_method": "sshd -T | grep -Ei '^(maxauthtries|clientaliveinterval|clientalivecountmax|logingracetime|allowusers|banner)' matches hardened values",
+    "status": "partially_compliant",
+    "matched_findings": [
+      {
+        "severity": "suggestion",
+        "test_id": "BANN-7126",
+        "message": "Add a legal banner to /etc/issue, to warn unauthorized users"
+      },
+      {
+        "severity": "suggestion",
+        "test_id": "BANN-7130",
+        "message": "Add legal banner to /etc/issue.net, to warn unauthorized users"
+      }
+    ],
+    "priority_score": 55,
+    "affected_asset": [
+      "billing-srv-01",
+      "web-srv-01",
+      "log-srv-01"
+    ],
+    "remediation_script": "4-ssh_hardening.sh",
+    "operational_risk": "Partially addressed: Lynis flags related weaknesses for \"Harden SSH session controls: auth attempts, idle timeout, grace time, banner, user allow-list\" that have not been fully remediated on billing-srv-01, web-srv-01, log-srv-01",
+    "expected_validation_check": "sshd -T | grep -Ei '^(maxauthtries|clientaliveinterval|clientalivecountmax|logingracetime|allowusers|banner)' matches hardened values"
+  },
+  {
+    "control_id": "MD-CIS-06",
+    "title": "Enable ASLR and kernel information-leak protections",
+    "severity": "high",
+    "asset_scope": [
+      "billing-srv-01",
+      "web-srv-01",
+      "log-srv-01"
+    ],
+    "implementation_task": "5-sysctl_hardening.sh",
+    "verification_method": "sysctl kernel.randomize_va_space kernel.kptr_restrict kernel.dmesg_restrict fs.suid_dumpable",
+    "status": "partially_compliant",
+    "matched_findings": [
+      {
+        "severity": "suggestion",
+        "test_id": "KRNL-5820",
+        "message": "If not required, consider explicit disabling of core dump in /etc/security/limits.conf file"
+      },
+      {
+        "severity": "suggestion",
+        "test_id": "KRNL-6000",
+        "message": "One or more sysctl values differ from the scan profile and could be tweaked"
+      }
+    ],
+    "priority_score": 55,
+    "affected_asset": [
+      "billing-srv-01",
+      "web-srv-01",
+      "log-srv-01"
+    ],
+    "remediation_script": "5-sysctl_hardening.sh",
+    "operational_risk": "Partially addressed: Lynis flags related weaknesses for \"Enable ASLR and kernel information-leak protections\" that have not been fully remediated on billing-srv-01, web-srv-01, log-srv-01",
+    "expected_validation_check": "sysctl kernel.randomize_va_space kernel.kptr_restrict kernel.dmesg_restrict fs.suid_dumpable"
+  },
+  {
+    "control_id": "MD-CIS-07",
+    "title": "Deploy default-deny host firewall, allow only required ports",
+    "severity": "high",
+    "asset_scope": [
+      "billing-srv-01",
+      "web-srv-01",
+      "log-srv-01"
+    ],
+    "implementation_task": "11-firewall_hardening.sh",
+    "verification_method": "ufw status verbose (or iptables -L) confirms default deny incoming plus an explicit allow list",
+    "status": "partially_compliant",
+    "matched_findings": [
+      {
+        "severity": "suggestion",
+        "test_id": "FIRE-4513",
+        "message": "Check iptables rules to see which rules are currently not used"
+      }
+    ],
+    "priority_score": 50,
+    "affected_asset": [
+      "billing-srv-01",
+      "web-srv-01",
+      "log-srv-01"
+    ],
+    "remediation_script": "11-firewall_hardening.sh",
+    "operational_risk": "Partially addressed: Lynis flags related weaknesses for \"Deploy default-deny host firewall, allow only required ports\" that have not been fully remediated on billing-srv-01, web-srv-01, log-srv-01",
+    "expected_validation_check": "ufw status verbose (or iptables -L) confirms default deny incoming plus an explicit allow list"
+  },
+  {
+    "control_id": "MD-CIS-11",
+    "title": "Remediate world-writable files and enforce noexec,nosuid,nodev on /tmp, /var/tmp, /dev/shm",
+    "severity": "medium",
+    "asset_scope": [
+      "billing-srv-01",
+      "web-srv-01",
+      "log-srv-01"
+    ],
+    "implementation_task": "6-filesystem_hardening.sh",
+    "verification_method": "find / -perm -0002 -type f returns none outside expected paths; mount output shows noexec,nosuid,nodev on the three mounts",
+    "status": "partially_compliant",
+    "matched_findings": [
+      {
+        "severity": "suggestion",
+        "test_id": "DEB-0280",
+        "message": "Install libpam-tmpdir to set $TMP and $TMPDIR for PAM sessions"
+      },
+      {
+        "severity": "suggestion",
+        "test_id": "FILE-6310",
+        "message": "To decrease the impact of a full /home file system, place /home on a separate partition"
+      },
+      {
+        "severity": "suggestion",
+        "test_id": "FILE-6310",
+        "message": "To decrease the impact of a full /tmp file system, place /tmp on a separate partition"
+      },
+      {
+        "severity": "suggestion",
+        "test_id": "FILE-6310",
+        "message": "To decrease the impact of a full /var file system, place /var on a separate partition"
+      },
+      {
+        "severity": "suggestion",
+        "test_id": "FILE-7524",
+        "message": "Consider restricting file permissions"
+      }
+    ],
+    "priority_score": 50,
+    "affected_asset": [
+      "billing-srv-01",
+      "web-srv-01",
+      "log-srv-01"
+    ],
+    "remediation_script": "6-filesystem_hardening.sh",
+    "operational_risk": "Partially addressed: Lynis flags related weaknesses for \"Remediate world-writable files and enforce noexec,nosuid,nodev on /tmp, /var/tmp, /dev/shm\" that have not been fully remediated on billing-srv-01, web-srv-01, log-srv-01",
+    "expected_validation_check": "find / -perm -0002 -type f returns none outside expected paths; mount output shows noexec,nosuid,nodev on the three mounts"
+  },
+  {
+    "control_id": "MD-CIS-14",
+    "title": "Configure retention and rotation for security-relevant logs",
+    "severity": "medium",
+    "asset_scope": [
+      "log-srv-01"
+    ],
+    "implementation_task": "12-log_retention.sh",
+    "verification_method": "logrotate -d against the deployed configs confirms retention of at least 90 days for auth, audit and application logs",
+    "status": "partially_compliant",
+    "matched_findings": [
+      {
+        "severity": "suggestion",
+        "test_id": "LOGG-2154",
+        "message": "Enable logging to an external logging host for archiving purposes and additional protection"
+      },
+      {
+        "severity": "suggestion",
+        "test_id": "LOGG-2190",
+        "message": "Check what deleted files are still in use and why."
+      }
+    ],
+    "priority_score": 40,
+    "affected_asset": [
+      "log-srv-01"
+    ],
+    "remediation_script": "12-log_retention.sh",
+    "operational_risk": "Partially addressed: Lynis flags related weaknesses for \"Configure retention and rotation for security-relevant logs\" that have not been fully remediated on log-srv-01",
+    "expected_validation_check": "logrotate -d against the deployed configs confirms retention of at least 90 days for auth, audit and application logs"
+  }
+]
