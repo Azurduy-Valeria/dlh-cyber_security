@@ -18,28 +18,3 @@ safe to re-run at any point for a fresh comparison snapshot.
 ```bash
 sudo ./0-baseline_snapshot.sh
 ```
-
-Root is recommended (full SUID/world-writable sweep, listening-socket
-process owners, sshd's fully resolved effective config) but not required:
-run without `sudo` and the script still completes, with a warning on
-stderr and a reduced-visibility snapshot (`ran_as_root: false` in the
-JSON).
-
-### Output
-
-A human-readable summary prints to stdout:
-
-```
-Hostname: billing-srv-01
-OS: Ubuntu 22.04.3 LTS
-Running services: 24
-Open ports: 11
-SUID binaries: 23
-SGID binaries: 12
-World-writable files: 7
-```
-
-The full structured record is written to
-`results/baseline_snapshot_<hostname>.json` (created on first run,
-overwritten on each later run for that host - `results/` is git-ignored
-since it's regenerated output, not a checked-in artifact).

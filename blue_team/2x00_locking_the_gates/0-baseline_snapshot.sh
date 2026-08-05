@@ -1,15 +1,10 @@
 #!/bin/bash
-set -euo pipefail
-IFS=$'\n\t'
 
-# --- Privilege check ---------------------------------------------------------
-IS_ROOT=false
-if [ "$(id -u)" -eq 0 ]; then
-    IS_ROOT=true
-else
-    echo "Warning: not running as root - some data (full SUID/world-writable" >&2
-    echo "sweep, listening-socket process owners, sshd effective config) will" >&2
-    echo "be incomplete. Re-run with: sudo ./0-baseline_snapshot.sh" >&2
+set -euo pipefail
+
+if [ "$(id -u)" -ne 0 ]; then
+    echo "Error: this script must be run as root (use: sudo ./0-baseline_snapshot.sh)" >&2
+    exit 1
 fi
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
@@ -19,11 +14,8 @@ mkdir -p "$RESULTS_DIR"
 HOSTNAME_VAL="$(hostname)"
 OUTPUT_FILE="${RESULTS_DIR}/baseline_snapshot_${HOSTNAME_VAL}.json"
 
-# --- JSON helpers ------------------------------------------------------------
-
+# --- JSON helpers (no jq dependency on a fresh box) -------------------------
 json_escape() {
-    # Escapes backslashes, double quotes and control characters for safe
-    # embedding of arbitrary filesystem/process strings inside a JSON string.
     local s="$1"
     s="${s//\\/\\\\}"
     s="${s//\"/\\\"}"
@@ -34,7 +26,6 @@ json_escape() {
 }
 
 array_from_lines() {
-    # Reads newline-delimited items on stdin, emits a JSON array of strings.
     local first=true
     printf '['
     while IFS= read -r line; do
@@ -46,7 +37,6 @@ array_from_lines() {
 }
 
 object_from_kv_lines() {
-    # Reads tab-separated "key<TAB>value" lines on stdin, emits a JSON object.
     local first=true
     printf '{'
     while IFS=$'\t' read -r k v; do
@@ -58,41 +48,41 @@ object_from_kv_lines() {
 }
 
 count_nonempty() {
-    # Counts non-blank lines on stdin. Always exits 0 - including on zero
-    # matches - so it never trips `set -e`/pipefail the way `grep -c .`
-    # would (grep -c exits 1 when the count is 0, which is a legitimate,
-    # expected result here, not a failure).
+    # grep -c . exits 1 on a zero count, which would trip pipefail on a
+    # perfectly normal "no matches" result. awk always exits 0.
     awk 'NF{c++} END{print c+0}'
 }
 
-# --- 1. System identification -------------------------------------------------
+# 1. System identification: hostname, OS, kernel version, uptime -----------
 OS_PRETTY="$(grep -oP '(?<=^PRETTY_NAME=).*' /etc/os-release 2>/dev/null | tr -d '"')" || OS_PRETTY=""
 [ -z "$OS_PRETTY" ] && OS_PRETTY="unknown"
 KERNEL_VER="$(uname -r)"
 UPTIME_HUMAN="$(uptime -p 2>/dev/null)" || UPTIME_HUMAN="unknown"
-UPTIME_SECONDS="$(awk '{print int($1)}' /proc/uptime 2>/dev/null)" || UPTIME_SECONDS=0
-[ -z "$UPTIME_SECONDS" ] && UPTIME_SECONDS=0
 
-# --- 2. Running services -------------------------------------------------------
-SERVICES_LIST="$(systemctl list-units --type=service --state=running --no-legend --plain 2>/dev/null | awk '{print $1}')" || SERVICES_LIST=""
+# 2. Running services and their state ---------------------------------------
+SERVICES_RAW="$(systemctl list-units --type=service --state=running --no-legend --plain 2>/dev/null)" || SERVICES_RAW=""
+SERVICES_LIST="$(printf '%s\n' "$SERVICES_RAW" | awk '{print $1":"$3}')"
 SERVICES_COUNT="$(printf '%s\n' "$SERVICES_LIST" | count_nonempty)"
 
-# --- 3. Open ports / listening sockets ------------------------------------------
+# 3. Open ports and listening sockets ----------------------------------------
 SOCKETS_LIST="$(ss -Htulnp 2>/dev/null)" || SOCKETS_LIST=""
 OPEN_PORTS_COUNT="$(printf '%s\n' "$SOCKETS_LIST" | count_nonempty)"
 
-# --- 4. SUID / SGID binaries ------------------------------------------------------
+# 4. SUID and SGID binaries - addresses privilege-escalation paths ----------
+# (Finding 011 territory: an unmanaged system accumulates these unnoticed.)
 SUID_LIST="$(find / \( -path /proc -o -path /sys -o -path /dev \) -prune -o -type f -perm -4000 -print 2>/dev/null)" || true
 SUID_COUNT="$(printf '%s\n' "$SUID_LIST" | count_nonempty)"
 
 SGID_LIST="$(find / \( -path /proc -o -path /sys -o -path /dev \) -prune -o -type f -perm -2000 -print 2>/dev/null)" || true
 SGID_COUNT="$(printf '%s\n' "$SGID_LIST" | count_nonempty)"
 
-# --- 5. World-writable files ------------------------------------------------------
+# 5. World-writable files, excluding /proc, /sys, /dev -----------------------
 WORLD_WRITABLE_LIST="$(find / \( -path /proc -o -path /sys -o -path /dev \) -prune -o -type f -perm -0002 -print 2>/dev/null)" || true
 WORLD_WRITABLE_COUNT="$(printf '%s\n' "$WORLD_WRITABLE_LIST" | count_nonempty)"
 
-# --- 6. Security-relevant sysctl parameters ---------------------------------------
+# 6. Security-relevant sysctl parameters -------------------------------------
+# SYN cookies, ICMP redirects, IP forwarding, ASLR, core dumps - the kernel
+# network/memory settings the hardening task will lock down.
 SYSCTL_PARAMS=(
     net.ipv4.tcp_syncookies
     net.ipv4.ip_forward
@@ -117,7 +107,8 @@ for p in "${SYSCTL_PARAMS[@]}"; do
     SYSCTL_KV="${SYSCTL_KV}${p}"$'\t'"${v}"$'\n'
 done
 
-# --- 7. SSH configuration ----------------------------------------------------------
+# 7. SSH configuration settings - directly baselines Finding 009 ------------
+# (SSH password authentication) against sshd's own effective config.
 SSHD_T_OUTPUT="$(sshd -T 2>/dev/null)" || SSHD_T_OUTPUT=""
 ssh_param() {
     local name="$1" lc value
@@ -140,9 +131,7 @@ for p in "${SSH_PARAMS[@]}"; do
     SSH_KV="${SSH_KV}${p}"$'\t'"${v}"$'\n'
 done
 
-# --- 8. User accounts and sudo membership -----------------------------------------
-# Which accounts can log in and which of those can become root is the blast
-# radius if any single credential is phished or brute-forced.
+# 8. Active user accounts and sudo group membership --------------------------
 ACTIVE_USERS_LIST="$(awk -F: '$7 !~ /(nologin|false)$/ {print $1":"$3":"$7}' /etc/passwd)"
 ACTIVE_USERS_COUNT="$(printf '%s\n' "$ACTIVE_USERS_LIST" | count_nonempty)"
 
@@ -151,16 +140,14 @@ ADMIN_MEMBERS="$(getent group admin 2>/dev/null | awk -F: '{print $4}' | tr ',' 
 SUDO_GROUP_LIST="$(printf '%s\n%s\n' "$SUDO_MEMBERS" "$ADMIN_MEMBERS" | sed '/^$/d' | sort -u)"
 SUDO_GROUP_COUNT="$(printf '%s\n' "$SUDO_GROUP_LIST" | count_nonempty)"
 
-# --- Assemble JSON -----------------------------------------------------------------
+# --- Assemble JSON -----------------------------------------------------------
 {
     printf '{\n'
     printf '  "timestamp": "%s",\n' "$(date -u '+%Y-%m-%dT%H:%M:%SZ' 2>/dev/null)"
     printf '  "hostname": "%s",\n' "$(json_escape "$HOSTNAME_VAL")"
-    printf '  "ran_as_root": %s,\n' "$IS_ROOT"
     printf '  "os": "%s",\n' "$(json_escape "$OS_PRETTY")"
     printf '  "kernel": "%s",\n' "$(json_escape "$KERNEL_VER")"
-    printf '  "uptime_human": "%s",\n' "$(json_escape "$UPTIME_HUMAN")"
-    printf '  "uptime_seconds": %s,\n' "${UPTIME_SECONDS:-0}"
+    printf '  "uptime": "%s",\n' "$(json_escape "$UPTIME_HUMAN")"
     printf '  "services": {\n'
     printf '    "count": %d,\n' "$SERVICES_COUNT"
     printf '    "running": %s\n' "$(printf '%s\n' "$SERVICES_LIST" | array_from_lines)"
@@ -192,7 +179,7 @@ SUDO_GROUP_COUNT="$(printf '%s\n' "$SUDO_GROUP_LIST" | count_nonempty)"
     printf '}\n'
 } > "$OUTPUT_FILE"
 
-# --- Human-readable summary (stdout) ------------------------------------------------
+# --- Human-readable summary --------------------------------------------------
 echo "Hostname: ${HOSTNAME_VAL}"
 echo "OS: ${OS_PRETTY}"
 echo "Running services: ${SERVICES_COUNT}"
@@ -200,4 +187,3 @@ echo "Open ports: ${OPEN_PORTS_COUNT}"
 echo "SUID binaries: ${SUID_COUNT}"
 echo "SGID binaries: ${SGID_COUNT}"
 echo "World-writable files: ${WORLD_WRITABLE_COUNT}"
-echo "Baseline JSON written to: ${OUTPUT_FILE}"
